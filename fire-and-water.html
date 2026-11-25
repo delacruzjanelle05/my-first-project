@@ -26,10 +26,15 @@
     .toast { position:absolute; top:14px; left:50%; max-width:calc(100% - 30px); padding:9px 14px; border:1px solid #ffffff20; border-radius:999px; color:#eef3e8; background:#10202dcc; font-size:11px; font-weight:700; text-align:center; opacity:0; transform:translate(-50%,-6px); pointer-events:none; transition:opacity .2s,transform .2s; }
     .toast.show { opacity:1; transform:translate(-50%,0); }
     .gamebar { display:flex; align-items:center; justify-content:space-between; gap:14px; padding:12px 17px; border-top:1px solid var(--line); }
+    .gamebar-actions { display:flex; align-items:center; gap:8px; }
+    .level-indicator { color:#9db2b8; font-size:10px; font-weight:750; white-space:nowrap; }
     .objective { display:flex; align-items:center; gap:10px; color:#dce7e5; font-size:11px; line-height:1.4; }
     .objective-icon { display:grid; width:26px; height:26px; flex:none; place-items:center; border-radius:8px; color:#c5efdb; background:#29463f; font-size:13px; }
     .restart { min-height:35px; padding:0 13px; border:1px solid #ffffff24; border-radius:10px; color:#eaf1eb; background:#ffffff08; cursor:pointer; font-size:11px; font-weight:750; transition:background .15s,border-color .15s; }
     .restart:hover { border-color:#ffffff55; background:#ffffff12; }
+    .next-level { min-height:35px; padding:0 13px; border:1px solid #8acbbb; border-radius:10px; color:#132d35; background:#a6e8d4; cursor:pointer; font-size:11px; font-weight:800; }
+    .next-level:hover:not(:disabled) { background:#c4f4e4; }
+    .next-level:disabled { display:none; }
     .controls { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:12px; }
     .control-card { display:flex; align-items:center; justify-content:space-between; gap:12px; min-height:67px; padding:12px 15px; border:1px solid var(--line); border-radius:15px; background:#1b2e40; }
     .control-person { display:flex; align-items:center; gap:10px; }
@@ -41,7 +46,7 @@
     .touch-controls { display:none; }
     .footer { display:flex; justify-content:space-between; gap:12px; padding:12px 3px 0; color:#82949e; font-size:10px; }
     button:focus-visible,a:focus-visible { outline:3px solid #a2e6d2; outline-offset:3px; }
-    @media(max-width:620px) { body { padding:16px 10px 24px; } .intro { align-items:start; flex-direction:column; gap:5px; } .subtitle { text-align:left; } .controls { gap:7px; } .control-card { align-items:flex-start; flex-direction:column; gap:8px; padding:10px; } .keyset { align-self:flex-end; } .person-hint { font-size:8px; } .footer { font-size:9px; } }
+    @media(max-width:620px) { body { padding:16px 10px 24px; } .intro { align-items:start; flex-direction:column; gap:5px; } .subtitle { text-align:left; } .gamebar { align-items:flex-start; flex-direction:column; } .gamebar-actions { display:grid; grid-template-columns:minmax(0,1fr) auto auto; width:100%; } .level-indicator { overflow:hidden; text-overflow:ellipsis; } .controls { gap:7px; } .control-card { align-items:flex-start; flex-direction:column; gap:8px; padding:10px; } .keyset { align-self:flex-end; } .person-hint { font-size:8px; } .footer { font-size:9px; } }
     @media(pointer:coarse) { .touch-controls { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:11px; } .touch-group { display:grid; grid-template-columns:repeat(3,1fr); gap:5px; padding:8px; border:1px solid var(--line); border-radius:13px; background:#1b2e40; } .touch-label { grid-column:1/-1; padding:1px 2px 3px; color:#abb9c0; font-size:9px; font-weight:800; } .touch-btn { min-height:38px; border:1px solid #ffffff25; border-radius:8px; color:#edf4ef; background:#284055; touch-action:none; user-select:none; } .touch-btn:active,.touch-btn.pressed { background:#426075; } }
     @media(prefers-reduced-motion:reduce) { *,*::before,*::after { transition-duration:.01ms!important; animation-duration:.01ms!important; } }
   </style>
@@ -49,10 +54,10 @@
 <body>
   <main class="shell">
     <header><div class="brand"><span class="brand-mark" aria-hidden="true">✦</span> Temple Team</div><nav aria-label="More games"><a class="game-link" href="index.html">Hue Hunt</a><a class="game-link" href="snake-and-ladders.html">Snakes &amp; Ladders</a></nav></header>
-    <section class="intro" aria-labelledby="title"><div><div class="eyebrow">Two heroes · one way out</div><h1 id="title">Fire &amp; Water</h1></div><p class="subtitle">Team up to reach the matching doors. Fire can cross lava, Water can cross pools — neither can touch the other’s element.</p></section>
+    <section class="intro" aria-labelledby="title"><div><div class="eyebrow">Two heroes · five temple rooms</div><h1 id="title">Fire &amp; Water</h1></div><p class="subtitle">Team up to reach the matching doors. Dodge spikes and moving sentries, cross only your element, and make it through all five rooms.</p></section>
     <section class="game-shell" aria-label="Fire and Water platform game">
       <div class="scene-wrap"><canvas id="game" width="960" height="540" tabindex="0" aria-label="Platform puzzle. Use A and D to move Fire, W to jump. Use arrow keys to move Water and Up to jump."></canvas><div class="toast" id="toast" role="status" aria-live="polite"></div></div>
-      <div class="gamebar"><div class="objective"><span class="objective-icon" aria-hidden="true">✧</span><span id="objective">Guide both friends to their glowing doors.</span></div><button class="restart" id="restart" type="button">↻ Restart level</button></div>
+      <div class="gamebar"><div class="objective"><span class="objective-icon" aria-hidden="true">✧</span><span id="objective">Guide both friends to their glowing doors.</span></div><div class="gamebar-actions"><span class="level-indicator" id="level-indicator">Level 1 of 5</span><button class="restart" id="restart" type="button">↻ Restart</button><button class="next-level" id="next-level" type="button" disabled>Next level →</button></div></div>
     </section>
     <div class="controls" aria-label="Keyboard controls">
       <div class="control-card"><div class="control-person"><span class="avatar fire" aria-hidden="true">♨</span><span><span class="person-name">Fire</span><span class="person-hint">Move and jump</span></span></div><div class="keyset"><kbd>A</kbd><kbd>W</kbd><kbd>D</kbd></div></div>
@@ -62,7 +67,7 @@
       <div class="touch-group" data-player="fire"><span class="touch-label">Fire controls</span><button class="touch-btn" data-key="KeyA" aria-label="Fire move left">←</button><button class="touch-btn" data-key="KeyW" aria-label="Fire jump">↑</button><button class="touch-btn" data-key="KeyD" aria-label="Fire move right">→</button></div>
       <div class="touch-group" data-player="water"><span class="touch-label">Water controls</span><button class="touch-btn" data-key="ArrowLeft" aria-label="Water move left">←</button><button class="touch-btn" data-key="ArrowUp" aria-label="Water jump">↑</button><button class="touch-btn" data-key="ArrowRight" aria-label="Water move right">→</button></div>
     </div>
-    <footer class="footer"><span>Wrong-colored pools send you back to the start.</span><span>Reach both doors to win together.</span></footer>
+    <footer class="footer"><span>Wrong pools, spikes, and sentries send you back to the start.</span><span>Clear all five rooms together.</span></footer>
   </main>
   <script>
     (() => {
@@ -72,27 +77,31 @@
       const objective = document.querySelector('#objective');
       const W = canvas.width, H = canvas.height;
       const keys = Object.create(null);
-      const platforms = [
-        {x:0,y:464,w:208,h:76}, {x:208,y:464,w:98,h:76,safeFor:'water'},
-        {x:306,y:464,w:112,h:76}, {x:418,y:464,w:124,h:76,safeFor:'fire'},
-        {x:542,y:464,w:108,h:76}, {x:650,y:464,w:98,h:76,safeFor:'water'},
-        {x:748,y:464,w:212,h:76},
-        {x:194,y:375,w:112,h:16}, {x:345,y:318,w:116,h:16},
-        {x:490,y:374,w:112,h:16}, {x:628,y:316,w:122,h:16},
-        {x:765,y:371,w:104,h:16}, {x:825,y:278,w:84,h:16},
-        {x:48,y:340,w:98,h:15}, {x:465,y:235,w:104,h:15},
-        {x:772,y:206,w:102,h:15}
+      const levelPlans = [
+        {name:'First Crossing',pools:[[208,98,'water'],[418,124,'fire'],[650,98,'water']],
+          platforms:[[194,375,112],[345,318,116],[490,374,112],[628,316,122],[765,371,104],[825,278,84],[48,340,98],[465,235,104],[772,206,102]],
+          spikes:[[397,302,25],[648,300,26]],saws:[{x:560,y:350,range:54,speed:1.35,phase:0}]},
+        {name:'Steamworks',pools:[[156,104,'fire'],[338,114,'water'],[536,122,'fire'],[738,100,'water']],
+          platforms:[[132,365,100],[253,304,108],[384,250,110],[510,330,108],[650,267,112],[775,349,110],[810,220,75],[298,188,92]],
+          spikes:[[273,288,27],[548,314,26],[808,333,27]],saws:[{x:466,y:286,range:66,speed:1.7,phase:1},{x:702,y:365,range:36,speed:1.1,phase:2}]},
+        {name:'Crystal Caves',pools:[[125,114,'water'],[300,130,'fire'],[486,110,'water'],[660,122,'fire'],[824,86,'water']],
+          platforms:[[98,368,112],[237,304,116],[367,255,108],[466,352,106],[558,292,112],[684,340,112],[768,270,116],[350,190,94],[603,208,90]],
+          spikes:[[250,288,28],[577,276,27],[708,324,28]],saws:[{x:422,y:328,range:52,speed:1.6,phase:1.4},{x:747,y:245,range:35,speed:1.2,phase:0.5}]},
+        {name:'Gear Garden',pools:[[178,130,'fire'],[394,110,'water'],[574,138,'fire'],[796,108,'water']],
+          platforms:[[150,365,110],[286,300,115],[410,355,110],[472,255,112],[585,318,115],[708,270,112],[810,360,100],[340,205,95],[720,180,92]],
+          spikes:[[306,284,28],[500,239,28],[737,254,28],[829,344,26]],saws:[{x:235,y:332,range:40,speed:1.8,phase:0},{x:535,y:300,range:50,speed:1.5,phase:2},{x:770,y:335,range:36,speed:2,phase:1}]},
+        {name:'The Last Leap',pools:[[138,105,'water'],[306,110,'fire'],[484,105,'water'],[652,110,'fire'],[820,84,'water']],
+          platforms:[[118,367,105],[220,295,106],[323,360,108],[393,255,105],[500,325,108],[566,230,105],[675,350,108],[742,270,110],[830,365,82],[785,190,92]],
+          spikes:[[239,279,26],[410,239,26],[584,214,27],[696,334,27],[846,349,26]],saws:[{x:281,y:336,range:44,speed:2,phase:0.8},{x:461,y:292,range:42,speed:1.7,phase:2},{x:640,y:308,range:50,speed:2.1,phase:1},{x:788,y:235,range:38,speed:1.4,phase:0}]}
       ];
-      const hazards = [
-        {x:208,w:98,type:'water'}, {x:418,w:124,type:'fire'}, {x:650,w:98,type:'water'}
-      ];
+      let currentLevel=0, platforms=[], hazards=[], spikes=[], saws=[];
       const spawns = {fire:{x:68,y:422},water:{x:119,y:422}};
       const doors = {fire:{x:855,y:395,w:37,h:69},water:{x:904,y:395,w:37,h:69}};
       const actors = [
         {name:'Fire',type:'fire',x:spawns.fire.x,y:spawns.fire.y,w:28,h:42,vx:0,vy:0,onGround:false,reached:false,face:1},
         {name:'Water',type:'water',x:spawns.water.x,y:spawns.water.y,w:28,h:42,vx:0,vy:0,onGround:false,reached:false,face:1}
       ];
-      let last = 0, time = 0, toastTimer = 0, complete = false;
+      let last = 0, time = 0, toastTimer = 0, complete = false, levelClear = false;
       const fireKeys = {left:'KeyA',right:'KeyD',jump:'KeyW'};
       const waterKeys = {left:'ArrowLeft',right:'ArrowRight',jump:'ArrowUp'};
 
@@ -101,14 +110,35 @@
         toast.textContent=text; toast.classList.add('show'); clearTimeout(toastTimer);
         toastTimer=setTimeout(()=>toast.classList.remove('show'),duration);
       }
+      function loadLevel(index) {
+        currentLevel=index;
+        const plan=levelPlans[currentLevel];
+        hazards=plan.pools.map(([x,w,type])=>({x,w,type,y:464,h:76}));
+        platforms=[];let cursor=0;
+        hazards.forEach(hazard=>{
+          if(hazard.x>cursor)platforms.push({x:cursor,y:464,w:hazard.x-cursor,h:76});
+          platforms.push({x:hazard.x,y:464,w:hazard.w,h:76,safeFor:hazard.type});
+          cursor=hazard.x+hazard.w;
+        });
+        if(cursor<W)platforms.push({x:cursor,y:464,w:W-cursor,h:76});
+        plan.platforms.forEach(([x,y,w])=>platforms.push({x,y,w,h:16}));
+        spikes=plan.spikes.map(([x,y,w])=>({x,y,w,h:16}));
+        saws=plan.saws.map(saw=>({...saw,baseX:saw.x,baseY:saw.y,w:26,h:26}));
+        actors.forEach(resetActor);complete=false;levelClear=false;
+        objective.textContent='Guide both friends to their glowing doors.';
+        document.querySelector('#level-indicator').textContent=`Level ${currentLevel+1} of ${levelPlans.length} · ${plan.name}`;
+        const nextButton=document.querySelector('#next-level');nextButton.disabled=true;nextButton.textContent='Next level →';
+        say(`Level ${currentLevel+1}: ${plan.name}`,1700);
+      }
       function resetActor(actor) {
         const spawn=spawns[actor.type]; actor.x=spawn.x; actor.y=spawn.y; actor.vx=0; actor.vy=0; actor.onGround=false; actor.reached=false;
       }
       function resetGame() {
-        actors.forEach(resetActor); complete=false; objective.textContent='Guide both friends to their glowing doors.';
+        actors.forEach(resetActor); complete=false;levelClear=false;document.querySelector('#next-level').disabled=true;
+        objective.textContent='Guide both friends to their glowing doors.';
         say('Level reset. You’ve got this!',1400);
       }
-      function jump(actor) { if(actor.onGround&&!actor.reached&&!complete){actor.vy=-610;actor.onGround=false;} }
+      function jump(actor) { if(actor.onGround&&!actor.reached&&!complete&&!levelClear){actor.vy=-610;actor.onGround=false;} }
       function handleKeyDown(event) {
         const code=event.code;
         if(['ArrowLeft','ArrowRight','ArrowUp','Space'].includes(code)) event.preventDefault();
@@ -123,6 +153,9 @@
       window.addEventListener('keyup',handleKeyUp);
       window.addEventListener('blur',()=>Object.keys(keys).forEach(key=>keys[key]=false));
       document.querySelector('#restart').addEventListener('click',resetGame);
+      document.querySelector('#next-level').addEventListener('click',()=>{
+        if(complete)loadLevel(0);else if(levelClear)loadLevel(currentLevel+1);
+      });
       document.querySelectorAll('.touch-btn').forEach(button=>{
         const code=button.dataset.key;
         const press=event=>{event.preventDefault();if(!keys[code]){if(code===fireKeys.jump)jump(actors[0]);if(code===waterKeys.jump)jump(actors[1]);}keys[code]=true;button.classList.add('pressed');};
@@ -132,7 +165,7 @@
       });
 
       function updateActor(actor,dt) {
-        if(actor.reached||complete)return;
+        if(actor.reached||complete||levelClear)return;
         const map=actor.type==='fire'?fireKeys:waterKeys;
         const direction=(keys[map.right]?1:0)-(keys[map.left]?1:0);
         actor.vx=direction*255; if(direction)actor.face=direction;
@@ -153,17 +186,28 @@
           else if(actor.vy<0&&oldY>=platform.y+platform.h-2) { actor.y=platform.y+platform.h; actor.vy=0; }
         }
         for(const hazard of hazards) {
-          if(hazard.type!==actor.type&&overlap(actor,{x:hazard.x,y:464,w:hazard.w,h:76})) {
+          if(hazard.type!==actor.type&&overlap(actor,hazard)) {
             resetActor(actor); say(`${actor.name} touched the ${hazard.type==='fire'?'lava':'water'} pool — try that jump again.`); return;
           }
         }
+        const obstacle=[...spikes,...saws].find(item=>overlap(actor,item));
+        if(obstacle) { resetActor(actor);say(`${actor.name} hit an obstacle — try a different route.`);return; }
         if(actor.y>H+10) { resetActor(actor); say(`${actor.name} fell! Back to the start.`); return; }
         if(overlap(actor,doors[actor.type])) {
           actor.reached=true; actor.vx=0; actor.vy=0;
           say(`${actor.name} made it to the door!`,1800);
           if(actors.every(friend=>friend.reached)) {
-            complete=true; objective.textContent='You did it! Fire and Water escaped together. Press Restart to play again.';
-            say('Teamwork! Both friends made it out! ✨',6000);
+            levelClear=true;
+            const nextButton=document.querySelector('#next-level');nextButton.disabled=false;
+            if(currentLevel===levelPlans.length-1) {
+              complete=true;nextButton.textContent='Play again ↻';
+              objective.textContent='You cleared every room! Fire and Water escaped together.';
+              say('Amazing teamwork! You cleared all five rooms! ✨',6000);
+            } else {
+              nextButton.textContent='Next level →';
+              objective.textContent=`Room cleared! Next up: ${levelPlans[currentLevel+1].name}.`;
+              say(`Room ${currentLevel+1} cleared! Ready for ${levelPlans[currentLevel+1].name}?`,5000);
+            }
           } else objective.textContent=`${actor.name} is safe! Help ${actors.find(friend=>!friend.reached).name} reach their door.`;
         }
       }
@@ -199,19 +243,30 @@
       function drawHazards() {
         for(const hazard of hazards) {
           const fire=hazard.type==='fire',base=fire?'#e96f45':'#36b8c0',deep=fire?'#6a3440':'#174c64';
-          const gradient=ctx.createLinearGradient(0,464,0,H);gradient.addColorStop(0,base);gradient.addColorStop(1,deep);
-          ctx.fillStyle=gradient;ctx.fillRect(hazard.x,464,hazard.w,76);
-          ctx.save();ctx.beginPath();ctx.rect(hazard.x,464,hazard.w,76);ctx.clip();
+          const gradient=ctx.createLinearGradient(0,hazard.y,0,hazard.y+hazard.h);gradient.addColorStop(0,base);gradient.addColorStop(1,deep);
+          ctx.fillStyle=gradient;ctx.fillRect(hazard.x,hazard.y,hazard.w,hazard.h);
+          ctx.save();ctx.beginPath();ctx.rect(hazard.x,hazard.y,hazard.w,hazard.h);ctx.clip();
           ctx.globalAlpha=.42;ctx.strokeStyle=fire?'#ffc080':'#b4fff2';ctx.lineWidth=2;
-          for(let row=0;row<4;row++) {ctx.beginPath();for(let x=hazard.x-5;x<=hazard.x+hazard.w+5;x+=5){const y=468+row*18+Math.sin(x*.065+time*3+row)*3;if(x===hazard.x-5)ctx.moveTo(x,y);else ctx.lineTo(x,y);}ctx.stroke();}
+          for(let row=0;row<4;row++) {ctx.beginPath();for(let x=hazard.x-5;x<=hazard.x+hazard.w+5;x+=5){const y=hazard.y+4+row*18+Math.sin(x*.065+time*3+row)*3;if(x===hazard.x-5)ctx.moveTo(x,y);else ctx.lineTo(x,y);}ctx.stroke();}
           ctx.restore();ctx.globalAlpha=1;
-          ctx.strokeStyle=fire?'#ffb56c':'#87f1e2';ctx.globalAlpha=.75;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(hazard.x,464);ctx.lineTo(hazard.x+hazard.w,464);ctx.stroke();ctx.globalAlpha=1;
+          ctx.strokeStyle=fire?'#ffb56c':'#87f1e2';ctx.globalAlpha=.75;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(hazard.x,hazard.y);ctx.lineTo(hazard.x+hazard.w,hazard.y);ctx.stroke();ctx.globalAlpha=1;
         }
         for(const p of platforms.filter(item=>item.safeFor)) {
           const fire=p.safeFor==='fire';const color=fire?'#ef8553':'#58c8c6';
           ctx.fillStyle=fire?'#8c4c42':'#286879';ctx.fillRect(p.x,p.y,p.w,p.h);
           ctx.fillStyle=color;ctx.globalAlpha=.75;ctx.fillRect(p.x,p.y,p.w,4);ctx.globalAlpha=1;
           for(let x=p.x+9;x<p.x+p.w;x+=23){ctx.fillStyle=color;ctx.globalAlpha=.18;ctx.beginPath();ctx.arc(x,478+Math.sin(time*2+x)*2,2,0,Math.PI*2);ctx.fill();}ctx.globalAlpha=1;
+        }
+        for(const spike of spikes) {
+          const count=Math.max(2,Math.floor(spike.w/11));ctx.fillStyle='#e89a63';ctx.strokeStyle='#ffd196';ctx.lineWidth=1;
+          for(let i=0;i<count;i++){const x=spike.x+i*spike.w/count,step=spike.w/count;ctx.beginPath();ctx.moveTo(x,spike.y+spike.h);ctx.lineTo(x+step/2,spike.y);ctx.lineTo(x+step,spike.y+spike.h);ctx.closePath();ctx.fill();ctx.stroke();}
+        }
+        for(const saw of saws) {
+          ctx.save();ctx.translate(saw.x+saw.w/2,saw.y+saw.h/2);ctx.rotate(time*2.2);
+          ctx.fillStyle='#c9d5d0';ctx.strokeStyle='#eef3df';ctx.lineWidth=1.5;
+          for(let i=0;i<10;i++){ctx.rotate(Math.PI/5);ctx.beginPath();ctx.moveTo(0,-8);ctx.lineTo(-4,-15);ctx.lineTo(4,-15);ctx.closePath();ctx.fill();ctx.stroke();}
+          ctx.beginPath();ctx.arc(0,0,10,0,Math.PI*2);ctx.fillStyle='#617780';ctx.fill();ctx.stroke();
+          ctx.beginPath();ctx.arc(0,0,3,0,Math.PI*2);ctx.fillStyle='#e9eee1';ctx.fill();ctx.restore();
         }
       }
       function drawDoor(door,type,actor) {
@@ -245,16 +300,20 @@
         drawBackground();drawHazards();drawPlatforms();
         drawDoor(doors.fire,'fire',actors[0]);drawDoor(doors.water,'water',actors[1]);
         actors.forEach(drawActor);
-        if(complete) {
+        if(levelClear) {
           ctx.fillStyle='#0b1929a8';ctx.fillRect(0,0,W,H);
-          ctx.textAlign='center';ctx.fillStyle='#f5f5e9';ctx.font='800 42px ui-sans-serif,system-ui';ctx.fillText('TEAMWORK!',W/2,H/2-8);
-          ctx.fillStyle='#bfe8d9';ctx.font='600 17px ui-sans-serif,system-ui';ctx.fillText('Fire & Water escaped together',W/2,H/2+25);
+          ctx.textAlign='center';ctx.fillStyle='#f5f5e9';ctx.font='800 39px ui-sans-serif,system-ui';
+          ctx.fillText(complete?'ALL ROOMS CLEARED!':`ROOM ${currentLevel+1} CLEAR!`,W/2,H/2-8);
+          ctx.fillStyle='#bfe8d9';ctx.font='600 16px ui-sans-serif,system-ui';
+          ctx.fillText(complete?'Fire & Water escaped together':`Next up: ${levelPlans[currentLevel+1].name}`,W/2,H/2+25);
         }
       }
       function loop(timestamp) {
         const dt=Math.min((timestamp-last)/1000||0,.032);last=timestamp;time+=dt;
+        saws.forEach(saw=>{saw.x=saw.baseX+Math.sin(time*saw.speed+saw.phase)*saw.range;});
         actors.forEach(actor=>updateActor(actor,dt));render();requestAnimationFrame(loop);
       }
+      loadLevel(0);
       requestAnimationFrame(loop);
     })();
   </script>
