@@ -40,6 +40,7 @@
     .eyebrow { color: var(--muted); font-size: 11px; font-weight: 700; letter-spacing: .13em; text-transform: uppercase; }
     .game-link { color: var(--accent); font-size: 12px; font-weight: 700; text-decoration: none; }
     .game-link:hover { text-decoration: underline; }
+    .game-nav { display: flex; align-items: center; gap: 14px; }
     .card { overflow: hidden; border: 1px solid rgba(222, 220, 211, .9); border-radius: 24px; background: var(--card); box-shadow: var(--shadow); }
     .intro { padding: 38px 40px 28px; text-align: center; }
     h1 { margin: 8px 0 7px; font-size: clamp(32px, 7vw, 48px); line-height: 1.04; letter-spacing: -.055em; }
@@ -97,7 +98,7 @@
   <main class="shell">
     <header>
       <div class="brand"><span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span> little color lab</div>
-      <a class="game-link" href="snake-and-ladders.html">Play Snakes &amp; Ladders ↗</a>
+      <nav class="game-nav" aria-label="More games"><a class="game-link" href="snake-and-ladders.html">Snakes &amp; Ladders</a><a class="game-link" href="fire-and-water.html">Fire &amp; Water ↗</a></nav>
     </header>
     <section class="card" aria-labelledby="title">
       <div class="intro">

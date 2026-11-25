@@ -17,6 +17,7 @@
     .brand-mark i { width:8px; height:8px; border-radius:3px; background:#d88e6e; }
     .brand-mark i:nth-child(2) { background:#839d73; } .brand-mark i:nth-child(3) { background:#dec270; } .brand-mark i:nth-child(4) { background:#8394a8; }
     .game-link { color:var(--green); font-size:12px; font-weight:700; text-decoration:none; } .game-link:hover { text-decoration:underline; }
+    .game-nav { display:flex; align-items:center; gap:14px; }
     .layout { display:grid; grid-template-columns:minmax(0,1fr) 280px; gap:20px; align-items:start; }
     .board-card,.side-card { overflow:hidden; border:1px solid rgba(222,220,211,.95); border-radius:23px; background:var(--card); box-shadow:var(--shadow); }
     .board-heading { display:flex; justify-content:space-between; align-items:end; gap:16px; padding:24px 27px 17px; }
@@ -83,7 +84,7 @@
   <main class="shell">
     <header>
       <div class="brand"><span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span> boardwalk games</div>
-      <a class="game-link" href="index.html">← Play Hue Hunt</a>
+      <nav class="game-nav" aria-label="More games"><a class="game-link" href="index.html">Hue Hunt</a><a class="game-link" href="fire-and-water.html">Fire &amp; Water ↗</a></nav>
     </header>
     <div class="layout">
       <section class="board-card" aria-labelledby="title">
